@@ -7,8 +7,7 @@ import asyncio
 from aiogram import Bot, Dispatcher
 from RBK.RBK_invest import parse_rbk_invest
 from RBK.RBK_news import parse_rbk_news
-from NewsEasyBotHandlers import router 
-from time import sleep
+from NewsEasyBotHandlers import router
 
 load_dotenv()
 

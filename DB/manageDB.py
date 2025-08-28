@@ -88,7 +88,6 @@ def save_to_database(news_item):
         return False
 
 
-# db_handler.py (дополнение)
 def get_news(limit=10, offset=0):
     conn = get_db_connection()
     cursor = conn.cursor()

@@ -68,7 +68,7 @@ def parse_rbk_invest():
         print(f"Ошибка при парсинге РБК Инвестиций: {e}")
 
 
-# Функция для получения полного текста статьи
+# функция для получения полного текста статьи (ИИ)
 def get_article_content(article_url, headers):
     try:
         print(f"Загрузка статьи: {article_url}")
