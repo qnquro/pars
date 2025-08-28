@@ -8,7 +8,6 @@ from DB.categorizer import categorize_article
 
 def parse_rbk_invest():
     source_name = "РБК Инвестиции"
-    # Правильный URL для новостей инвестиций
     base_url = "https://www.rbc.ru/finances/"
     print("Начало парсинга РБК Инвестиции")
 
@@ -16,22 +15,16 @@ def parse_rbk_invest():
     headers = {'user-agent': ua.random}
 
     try:
-        print("Отправка запроса...")
         response = requests.get(base_url, headers=headers)
         response.raise_for_status()
-        print("Запрос успешен")
 
         soup = BeautifulSoup(response.text, "lxml")
-        print("HTML получен и распарсен")
 
-        # Ищем новостные блоки - правильные классы для РБК
         news_items = soup.find_all("div", class_="item")
         print(f"Найдено новостных блоков: {len(news_items)}")
 
         for news_item in news_items:
             try:
-                print("Обработка новости...")
-                # Ищем ссылку на новость
                 news_link = news_item.find("a", class_="item__link")
                 if not news_link:
                     print("Не найдена ссылка на новость")
@@ -49,7 +42,6 @@ def parse_rbk_invest():
                 date_elem = news_item.find("span", class_="item__category")
                 date = date_elem.text.strip() if date_elem else ""
 
-                print(f"Получение контента для: {short_text}")
                 content = get_article_content(card_url, headers)
 
                 category = categorize_article(short_text, content)
