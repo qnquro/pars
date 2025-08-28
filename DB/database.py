@@ -9,11 +9,13 @@ def create_database():
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS EasyNews (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        source TEXT NOT NULL,
-        title TEXT NOT NULL,
-        content TEXT,
+        category TEXT,
         date TEXT,
-        category TEXT
+        ist TEXT,
+        link TEXT UNIQUE,
+        short_text TEXT,
+        content TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
     ''')
 
