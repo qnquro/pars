@@ -1,19 +1,20 @@
 #projectBOT
+#основной файл который всё запускает
 import os
-
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from dotenv import load_dotenv
 import asyncio
+from apscheduler.schedulers.asyncio import AsyncIOScheduler # нужно для того чтобы и бот и парсеры работали одновременно
+from dotenv import load_dotenv # для работы в .env файлами(кто не знает что это - прочитайте в инете)
 from aiogram import Bot, Dispatcher
 from RBK.RBK_invest import parse_rbk_invest
 from RBK.RBK_news import parse_rbk_news
 from NewsEasyBotHandlers import router
 
-load_dotenv()
+load_dotenv() # нашли .env файл
 
-token = os.getenv("TOKEN")
+token = os.getenv("TOKEN") # достали из .env файла token
 
 #--------------------------------
+# функция для того, чтобы запускать парсеры
 async def run_parsers():
     try:
         loop = asyncio.get_event_loop()
@@ -23,20 +24,20 @@ async def run_parsers():
     except Exception as e:
         print(f"Ошибка в парсерах: {e}")
 
-
+# ну не зря это main функция, она всё запускает
 async def main():
     scheduler = AsyncIOScheduler()
-    scheduler.add_job(run_parsers, 'interval', minutes=15)
-    scheduler.start()
+    scheduler.add_job(run_parsers, 'interval', minutes=15) #создал параллельный асинхронный поток для функции run_parsers, который будет запускать её раз в 15 минут
+    scheduler.start() # запустил поток
     bot = Bot(token=token)
 
     dp = Dispatcher()
     dp.include_router(router)
     await dp.start_polling(bot)
     try:
-        await asyncio.Future()
+        await asyncio.Future() #бесконечный цикл
     finally:
-        scheduler.shutdown()
+        scheduler.shutdown() #выключение потока в случае остановки бота
 
 
 if __name__ == "__main__":

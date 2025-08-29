@@ -5,11 +5,11 @@ import time
 from DB.manageDB import save_to_database
 from DB.categorizer import categorize_article
 
+# переделанный парсер Влада
 
 def parse_rbk_invest():
     source_name = "РБК Инвестиции"
     base_url = "https://www.rbc.ru/finances/"
-    print("Начало парсинга РБК Инвестиции")
 
     ua = UserAgent()
     headers = {'user-agent': ua.random}
@@ -21,7 +21,6 @@ def parse_rbk_invest():
         soup = BeautifulSoup(response.text, "lxml")
 
         news_items = soup.find_all("div", class_="item")
-        print(f"Найдено новостных блоков: {len(news_items)}")
 
         for news_item in news_items:
             try:

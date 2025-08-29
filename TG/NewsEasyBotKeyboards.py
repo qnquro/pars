@@ -1,5 +1,7 @@
 #NewsEasyBotKeyboards.py
 
+# файл со всеми клавиатурами, тоже Кристиан шарит. единственное, что я добавил функцию для клавиатуры с пагинацией по страницам
+
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton
 #================
 

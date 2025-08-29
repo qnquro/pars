@@ -1,5 +1,7 @@
 # RBK_news.py
 
+# переделанный парсер Кристиана
+
 import requests
 from bs4 import BeautifulSoup
 from fake_useragent import UserAgent
@@ -57,7 +59,7 @@ def parse_rbk_news():
         print(f"Ошибка при парсинге РБК: {e}")
 
 
-#функция для получения полного текста статьи. ИИ написал
+# функция для получения полного текста статьи. ИИ написал
 def get_article_content(article_url, headers):
     try:
         response = requests.get(article_url, headers=headers)

@@ -1,6 +1,6 @@
 import sqlite3
-from datetime import datetime
 
+# функция создания БД. ничего не трогайте тут и не запускайте
 
 def create_database():
     conn = sqlite3.connect('easynews.db')

@@ -3,9 +3,13 @@ from datetime import datetime
 import re
 import os
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DB_PATH = os.path.join(BASE_DIR, 'easynews.db')
+#файл с командами для БД
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DB_PATH = os.path.join(BASE_DIR, 'easynews.db') # это нужно чтобы "локализовать" расположение БД, иначе парсеры когда обращаются к этому файлу могут создать свою бд но в своей папке.
+# условно файл RBK_news обратиться к фукнции их этого файла и зачем-то создаст БД в папке RBK
+
+# функция для преобразования даты в общий вид. поэтому вы можете в своих парсерах не обрабатывать дату
 def normalize_date(date_str):
     if not date_str:
         return datetime.now().strftime('%d:%m:%Y')
@@ -46,10 +50,11 @@ def normalize_date(date_str):
 
     return datetime.now().strftime('%d:%m:%Y')
 
-
+# это продолжение истории с "локализацией" БД
 def get_db_connection():
     return sqlite3.connect(DB_PATH)
 
+# функция для сохранения из парсера в БД
 def save_to_database(news_item):
     category = news_item.get('category', '').lower().strip()
     date = normalize_date(news_item.get('date'))
@@ -87,7 +92,7 @@ def save_to_database(news_item):
         print(f"Ошибка при сохранении в базу данных: {e}")
         return False
 
-
+# эта функция уже для бота, чтобы он выводил новости
 def get_news(limit=10, offset=0):
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -112,7 +117,7 @@ def get_news(limit=10, offset=0):
     conn.close()
     return news
 
-
+# нужно для правильной пагинации по блокам новостей
 def get_news_count():
     conn = get_db_connection()
     cursor = conn.cursor()

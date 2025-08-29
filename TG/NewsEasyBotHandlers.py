@@ -1,12 +1,12 @@
 # NewsEasyBotHandlers.py
-import time
 from aiogram import F, Router
 from aiogram.types import Message, CallbackQuery
 from aiogram.filters import CommandStart
-from aiogram.utils.keyboard import InlineKeyboardBuilder
+
+# тут все обработчики для бота, Кристиан шарит за всё, единственное, что я добавил это функции: show_news, next_page, prev_page. в этих функциях реализуется пагинация. там есть комментарии в принципе
 
 import NewsEasyBotKeyboards as kb
-from DB.manageDB import get_news, get_news_count
+from DB.manageDB import get_news, get_news_count # из файла управления БД две функции которые и будут выводить новости и одновременно помогать с пагинацией
 
 router = Router()
 
@@ -41,7 +41,7 @@ async def show_news(callback: CallbackQuery):
     await callback.message.edit_text("<b>👀 Смотреть новости</b>", parse_mode="html")
     await callback.message.answer("Выполняю поиск и отправляю Вам все свежие новости...")
 
-    # Получаем новости
+    # получаем новости
     news = get_news()
     total_news = get_news_count()
     total_pages = (total_news + 9) // 10  # Округляем вверх
@@ -50,7 +50,7 @@ async def show_news(callback: CallbackQuery):
         await callback.message.answer("Новостей нет :(")
         return
 
-    # Отправляем новости
+    # отправляем новости
     sent_messages = []
     for item in news:
         news_text = f"<b>{item['category'].capitalize()}</b>\n"
@@ -62,17 +62,17 @@ async def show_news(callback: CallbackQuery):
         msg = await callback.message.answer(news_text, parse_mode="HTML")
         sent_messages.append(msg.message_id)
 
-    # Сохраняем ID сообщений для возможного удаления
+    # сохраняем ID сообщений для возможного удаления
     user_id = callback.from_user.id
     user_news_messages[user_id] = sent_messages
 
-    # Отправляем кнопки пагинации
+    # отправляем кнопки пагинации
     pagination_msg = await callback.message.answer(
         f"Страница 1 из {total_pages}",
         reply_markup=kb.get_pagination_keyboard(0, total_pages)
     )
 
-    # Сохраняем ID сообщения с пагинацией
+    # сохраняем ID сообщения с пагинацией
     user_news_messages[user_id].append(pagination_msg.message_id)
 
 
