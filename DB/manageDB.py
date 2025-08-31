@@ -3,13 +3,10 @@ from datetime import datetime
 import re
 import os
 
-#файл с командами для БД
-
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DB_PATH = os.path.join(BASE_DIR, 'easynews.db') # это нужно чтобы "локализовать" расположение БД, иначе парсеры когда обращаются к этому файлу могут создать свою бд но в своей папке.
-# условно файл RBK_news обратиться к фукнции их этого файла и зачем-то создаст БД в папке RBK
+DB_PATH = os.path.join(BASE_DIR, 'easynews.db')
 
-# функция для преобразования даты в общий вид. поэтому вы можете в своих парсерах не обрабатывать дату
+
 def normalize_date(date_str):
     if not date_str:
         return datetime.now().strftime('%d:%m:%Y')
@@ -50,11 +47,11 @@ def normalize_date(date_str):
 
     return datetime.now().strftime('%d:%m:%Y')
 
-# это продолжение истории с "локализацией" БД
+
 def get_db_connection():
     return sqlite3.connect(DB_PATH)
 
-# функция для сохранения из парсера в БД
+
 def save_to_database(news_item):
     category = news_item.get('category', '').lower().strip()
     date = normalize_date(news_item.get('date'))
@@ -92,16 +89,32 @@ def save_to_database(news_item):
         print(f"Ошибка при сохранении в базу данных: {e}")
         return False
 
-# эта функция уже для бота, чтобы он выводил новости
-def get_news(limit=10, offset=0):
+
+def get_news(limit=10, offset=0, source=None, keyword=None):
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute('''
+
+    query = '''
     SELECT category, date, ist, link, short_text, content 
     FROM EasyNews 
-    ORDER BY created_at DESC 
-    LIMIT ? OFFSET ?
-    ''', (limit, offset))
+    '''
+    params = []
+
+    where_clauses = []
+    if source:
+        where_clauses.append("ist = ?")
+        params.append(source)
+    if keyword:
+        where_clauses.append("(short_text LIKE ? OR content LIKE ?)")
+        params.extend([f"%{keyword}%", f"%{keyword}%"])
+
+    if where_clauses:
+        query += " WHERE " + " AND ".join(where_clauses)
+
+    query += " ORDER BY created_at DESC LIMIT ? OFFSET ?"
+    params.extend([limit, offset])
+
+    cursor.execute(query, params)
 
     news = []
     for item in cursor.fetchall():
@@ -117,11 +130,45 @@ def get_news(limit=10, offset=0):
     conn.close()
     return news
 
-# нужно для правильной пагинации по блокам новостей
-def get_news_count():
+
+def get_news_count(source=None, keyword=None):
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute('SELECT COUNT(*) FROM EasyNews')
+
+    query = 'SELECT COUNT(*) FROM EasyNews'
+    params = []
+
+    where_clauses = []
+    if source:
+        where_clauses.append("ist = ?")
+        params.append(source)
+    if keyword:
+        where_clauses.append("(short_text LIKE ? OR content LIKE ?)")
+        params.extend([f"%{keyword}%", f"%{keyword}%"])
+
+    if where_clauses:
+        query += " WHERE " + " AND ".join(where_clauses)
+
+    cursor.execute(query, params)
     count = cursor.fetchone()[0]
     conn.close()
     return count
+
+
+def delete_lenta_ru_news():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("DELETE FROM EasyNews WHERE ist = ?", ('Lenta.ru',))
+
+    deleted_count = cursor.rowcount
+    conn.commit()
+    conn.close()
+
+    print(f"Удалено {deleted_count} записей из Lenta.ru")
+    return deleted_count
+
+
+# Вызов функции
+if __name__ == "__main__":
+    delete_lenta_ru_news()

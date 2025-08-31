@@ -8,6 +8,23 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMar
 
 
 #================
+# Add to NewsEasyBotKeyboards.py
+sources_keyboard = InlineKeyboardMarkup(inline_keyboard=[
+    [InlineKeyboardButton(text="РБК Новости", callback_data="source_РБК Новости")],
+    [InlineKeyboardButton(text="РБК Инвестиции", callback_data="source_РБК Инвестиции")],
+   [InlineKeyboardButton(text="Лента.ру", callback_data="source_Lenta.ru")],
+    [InlineKeyboardButton(text="Interfax", callback_data="source_Interfax.ru")],
+    [InlineKeyboardButton(text="Назад", callback_data="back1")]
+])
+
+def get_pagination_keyboard(current_page, total_pages, prefix=""):
+    keyboard = []
+    if current_page > 0:
+        keyboard.append(InlineKeyboardButton(text="◀️ Предыдущая", callback_data=f"{prefix}prev_{current_page}"))
+    if current_page < total_pages - 1:
+        keyboard.append(InlineKeyboardButton(text="Следующая ▶️", callback_data=f"{prefix}next_{current_page}"))
+    return InlineKeyboardMarkup(inline_keyboard=[keyboard])
+
 start = ReplyKeyboardMarkup(keyboard=[[KeyboardButton(text="📰Новости📰")],[KeyboardButton(text="💡О нас💡")]], 
 									resize_keyboard=True, 
 									input_field_placeholder="Выберите пункт меню")
@@ -47,14 +64,3 @@ back2 =  InlineKeyboardMarkup(inline_keyboard=[
 
 
 	])
-
-
-def get_pagination_keyboard(page=0, total_pages=1):
-    buttons = []
-    if page > 0:
-        buttons.append(InlineKeyboardButton(text="⬅️ Назад", callback_data=f"prev_{page}"))
-
-    if page < total_pages - 1:
-        buttons.append(InlineKeyboardButton(text="Вперед ➡️", callback_data=f"next_{page}"))
-
-    return InlineKeyboardMarkup(inline_keyboard=[buttons])
